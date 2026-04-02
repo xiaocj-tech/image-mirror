@@ -1,28 +1,26 @@
-name: Push MySQL to ACR
+name: Push WordPress to ACR
 
 on:
-  workflow_dispatch: # 允许手动点击运行
+  workflow_dispatch: # 手动触发
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Login to ACR
-        # 将保险柜里的秘密映射到环境变量
         env:
           MY_USER: ${{ secrets.ACR_USERNAME }}
           MY_PASS: ${{ secrets.ACR_PASSWORD }}
-        # 使用管道符输入密码，防止 403 和交互式报错
         run: |
           echo "$MY_PASS" | docker login --username="$MY_USER" --password-stdin crpi-toh62d9r33b57uka.cn-beijing.personal.cr.aliyuncs.com
 
       - name: Pull and Push
         run: |
-          # 1. 拉取官方镜像
-          docker pull mysql:9.0.1
+          # 1. 拉取你刚才报错的那个 WordPress 版本
+          docker pull wordpress:6.7.2
           
-          # 2. 使用你的专属长地址打标签
-          docker tag mysql:9.0.1 crpi-toh62d9r33b57uka.cn-beijing.personal.cr.aliyuncs.com/my-test-repo1/mysql:9.0.1
+          # 2. 打标签 (注意这里路径还是你的命名空间 my-test-repo1)
+          docker tag wordpress:6.7.2 crpi-toh62d9r33b57uka.cn-beijing.personal.cr.aliyuncs.com/my-test-repo1/wordpress:6.7.2
           
-          # 3. 推送到你的个人版私有仓库
-          docker push crpi-toh62d9r33b57uka.cn-beijing.personal.cr.aliyuncs.com/my-test-repo1/mysql:9.0.1
+          # 3. 推送到阿里云
+          docker push crpi-toh62d9r33b57uka.cn-beijing.personal.cr.aliyuncs.com/my-test-repo1/wordpress:6.7.2
